@@ -21,7 +21,7 @@ export default function Component() {
     <div className="relative w-full h-screen">
       <img
         src="images\image (1).png"
-        alt="Blog Search Background"
+        alt="Blog"
         className="absolute inset-0 w-full h-full object-cover filter blur-sm"
       />
       <div className="relative z-10 flex flex-col items-center justify-center h-full px-4 md:px-6 lg:px-8">
