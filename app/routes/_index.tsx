@@ -7,42 +7,57 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export default function Index() {
+/**
+ * v0 by Vercel.
+ * @see https://v0.dev/t/Vh6S5x88xAt
+ * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
+ */
+import { Input } from "~/components/ui/input"
+import { Button } from "~/components/ui/button"
+import {Link} from "@remix-run/react"
+
+export default function Component() {
   return (
-    <div className="font-sans p-4">
-      <h1 className="text-3xl">Welcome to Remix</h1>
-      <ul className="list-disc mt-4 pl-6 space-y-2">
-        <li>
-          <a
-            className="text-blue-700 underline visited:text-purple-900"
-            target="_blank"
-            href="https://remix.run/start/quickstart"
-            rel="noreferrer"
+    <div className="relative w-full h-screen">
+      <img
+        src="app\images\image (1).png"
+        alt="Blog Search Background"
+        className="absolute inset-0 w-full h-full object-cover filter blur-sm"
+      />
+      <div className="relative z-10 flex flex-col items-center justify-center h-full px-4 md:px-6 lg:px-8">
+        <div className="max-w-3xl w-full space-y-6 text-center">
+          <h1 className="text-4xl font-bold tracking-tight text-gray-50 sm:text-5xl lg:text-6xl">
+            Discover the Best Blog Content
+          </h1>
+          <p className="text-lg text-gray-200 sm:text-xl">
+            Search through our vast library of blog posts to find the content you looking for.
+          </p>
+          <div className="w-full  items-center justify-center">
+            <form className="relative">
+              <Input
+                type="search"
+                placeholder="Search blog posts..."
+                className="w-full rounded-full bg-white/90 px-6 py-4 text-gray-900 focus:bg-white focus:outline-none"
+              />
+              <Button
+                type="submit"
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-gray-900 px-6 py-2 text-white hover:bg-gray-800 focus:outline-none"
+              >
+                Search
+              </Button>
+            </form>
+          </div>
+        </div>
+        <div className="absolute top-4 right-4">
+          <Link
+            to="/adminlogin"
+            className="inline-flex items-center rounded-full bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 focus:outline-none"
+            prefetch="none"
           >
-            5m Quick Start
-          </a>
-        </li>
-        <li>
-          <a
-            className="text-blue-700 underline visited:text-purple-900"
-            target="_blank"
-            href="https://remix.run/start/tutorial"
-            rel="noreferrer"
-          >
-            30m Tutorial
-          </a>
-        </li>
-        <li>
-          <a
-            className="text-blue-700 underline visited:text-purple-900"
-            target="_blank"
-            href="https://remix.run/docs"
-            rel="noreferrer"
-          >
-            Remix Docs
-          </a>
-        </li>
-      </ul>
+            Admin Login
+          </Link>
+        </div>
+      </div>
     </div>
-  );
+  )
 }
