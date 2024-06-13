@@ -20,7 +20,7 @@ export default function Component() {
   return (
     <div className="relative w-full h-screen">
       <img
-        src="app\images\image (1).png"
+        src="images\image (1).png"
         alt="Blog Search Background"
         className="absolute inset-0 w-full h-full object-cover filter blur-sm"
       />
