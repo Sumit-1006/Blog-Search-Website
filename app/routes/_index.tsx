@@ -1,4 +1,4 @@
-import type { LoaderFunction, ActionFunction, MetaFunction } from "@remix-run/node";
+import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData, Form, useNavigation } from "@remix-run/react";
 import { Input } from "~/components/ui/input";
@@ -22,7 +22,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     return json({ results: [] }); // Return an empty array if no query
   }
 
-  const response = await fetch(`https://api.unsplash.com/search/photos?page=1&query=${query}`, {
+  const response = await fetch(`https://api.unsplash.com/search/photos?page=1&per_page=30&query=${query}`, {
     headers: {
       Authorization: 'Client-ID Sahsc_dhXRNry03wAoExe_vHRMHKuNa6JT8_KFn3mOA',
     },
@@ -34,21 +34,6 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const data = await response.json();
   return json(data);
-};
-
-// Action function to handle form submission
-export const action: ActionFunction = async ({ request }) => {
-  const formData = await request.formData();
-  const query = formData.get("query");
-
-  const searchParams = new URLSearchParams();
-  if (query) {
-    searchParams.set("query", query.toString());
-  }
-
-  return json({
-    url: `/search?${searchParams.toString()}`,
-  });
 };
 
 // Main component
@@ -107,7 +92,7 @@ export default function Component() {
       </div>
       <div className="relative z-10 mt-8 px-4 md:px-6 lg:px-8">
         {data.results && data.results.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {data.results.map((photo: any) => (
               <div key={photo.id} className="w-full h-48 relative">
                 <img
