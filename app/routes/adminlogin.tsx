@@ -12,8 +12,8 @@ export default function Component() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-900">
-      <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md space-y-6">
+    <div className="flex min-h-screen items-center justify-center bg-gray-800 dark:bg-gray-900">
+      <div className="w-full max-w-md p-6 bg-gray-200 rounded-lg shadow-md space-y-6">
         <Card>
           <CardHeader>
             <CardTitle className="text-3xl font-bold">Login</CardTitle>
