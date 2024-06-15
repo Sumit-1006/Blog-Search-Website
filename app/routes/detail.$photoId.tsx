@@ -47,7 +47,7 @@ export default function Detail() {
       />
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 md:px-6 lg:px-8">
         <div className="w-full text-center space-y-6">
-          <h1 className="text-4xl font-serif font-bold tracking-tight text-white sm:text-5xl lg:text-6xl drop-shadow-lg p-4 bg-black/50 rounded-lg">
+          <h1 className="text-4xl font-serif font-bold tracking-tight text-white sm:text-5xl lg:text-5xl drop-shadow-lg p-4 bg-black/50 rounded-lg">
             {capitalizeFirstWord(photo.alt_description)}
           </h1>
           <div className="flex justify-center">

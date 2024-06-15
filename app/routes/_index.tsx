@@ -1,8 +1,10 @@
+// Import necessary components and hooks
 import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData, Form, useNavigation, Link } from "@remix-run/react";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
+import { useState } from "react"; // Import useState hook
 
 // Meta function for setting the page metadata
 export const meta: MetaFunction = () => {
@@ -39,6 +41,14 @@ export const loader: LoaderFunction = async ({ request }) => {
 export default function Component() {
   const data = useLoaderData();
   const navigation = useNavigation();
+  const [searchQuery, setSearchQuery] = useState(""); // State to store search query
+
+  // Function to handle clearing the search input
+  const handleClearSearch = () => {
+    setSearchQuery(""); // Clear search query
+  };
+
+  // Function to handle form submission (not shown for brevity)
 
   return (
     <div className="relative w-full h-screen bg-gray-200">
@@ -52,17 +62,30 @@ export default function Component() {
           <h1 className="text-4xl font-bold tracking-tight text-gray-50 sm:text-5xl lg:text-6xl">
             Discover the Best Blog Content
           </h1>
-          <p className="text-lg text-gray-200 sm:text-xl">
+          <p className="text-xl text-gray-200 sm:text-2xl">
             Search through our vast library of blog posts to find the content you're looking for.
           </p>
           <div className="w-full items-center justify-center">
             <Form method="get" className="relative">
-              <Input
-                name="query"
-                type="search"
-                placeholder="Search images..."
-                className="w-full rounded-full bg-white/90 px-6 py-4 text-gray-900 focus:bg-white focus:outline-none"
-              />
+              <div className="relative flex items-center">
+                <Input
+                  name="query"
+                  type="search"
+                  value={searchQuery} // Bind value to searchQuery state
+                  onChange={(e) => setSearchQuery(e.target.value)} // Update searchQuery state
+                  placeholder="Search images..."
+                  className="w-full h-12 px-6 py-4 text-lg rounded-full bg-white/90 text-gray-900 focus:bg-white focus:outline-none"
+                />
+                {searchQuery && ( // Conditionally render clear button when searchQuery has value
+                  <Button
+                    type="button"
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-800 focus:outline-none"
+                    onClick={handleClearSearch}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
               <Button
                 type="submit"
                 className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-gray-900 px-6 py-2 text-white hover:bg-gray-800 focus:outline-none"
@@ -100,7 +123,7 @@ export default function Component() {
                   className="w-full h-48 object-cover rounded-t-lg"
                 />
                 <div className="p-4 bg-gray-600 text-white">
-                  <h3 className="text-lg font-bold mb-2 text-center">{photo.alt_description}</h3>
+                  <h3 className="text-lg font-bold mb-2 text-center capitalize">{photo.alt_description}</h3>
                   <div className="flex justify-center">
                     <Link
                       to={`/detail/${photo.id}`}
