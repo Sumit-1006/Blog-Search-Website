@@ -30,7 +30,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   });
 
   if (!response.ok) {
-    throw new Error(`Error fetching photos: ${response.statusText}`);
+    throw new Error(`Error fetching Blogs: ${response.statusText}`);
   }
 
   const data = await response.json();
@@ -73,7 +73,7 @@ export default function Component() {
                   type="search"
                   value={searchQuery} // Bind value to searchQuery state
                   onChange={(e) => setSearchQuery(e.target.value)} // Update searchQuery state
-                  placeholder="Search images..."
+                  placeholder="Search Blogs..."
                   className="w-full h-12 px-6 py-4 text-lg rounded-full bg-white/90 text-gray-900 focus:bg-white focus:outline-none"
                 />
                 {searchQuery && ( // Conditionally render clear button when searchQuery has value

@@ -14,7 +14,7 @@ export const action: ActionFunction = async ({ request }) => {
     const formData = await request.formData();
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
-    //console.log("hello");
+    console.log("hello");
     const supabase = getSupabase();
   
     // Sign up the user
@@ -27,7 +27,7 @@ export const action: ActionFunction = async ({ request }) => {
         
   
     if (error) {
-        //console.log(error);
+        console.log(error);
       if (error.message.includes("rate limit")) {
         return json(
           { error: "Email rate limit exceeded. Please try again later." },
