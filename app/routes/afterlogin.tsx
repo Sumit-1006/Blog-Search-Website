@@ -1,4 +1,4 @@
-import { useState } from "react";
+//import { useState } from "react";
 import { json } from "@remix-run/node";
 import { Form, useActionData, redirect } from "@remix-run/react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "~/components/ui/card";
@@ -9,7 +9,7 @@ import { Button } from "~/components/ui/button";
 import { getSupabase } from "~/supabaseclient"; // Ensure to import your Supabase client function
 
 // Action function to handle form submission
-export const action = async ({ request }) => {
+/*export const action = async ({ request }) => {
   const formData = await request.formData();
   const imageUrl = formData.get("image-url") as string;
   const heading = formData.get("heading") as string;
@@ -27,7 +27,7 @@ export const action = async ({ request }) => {
   }
 
   return redirect("/afterlogin"); // Redirect to the same page after successful addition
-};
+};*/
 
 export default function AfterLogin() {
   const actionData = useActionData();
