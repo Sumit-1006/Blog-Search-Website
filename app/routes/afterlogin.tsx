@@ -75,10 +75,9 @@ export default function AfterLogin() {
         style={{ backgroundImage: `url('/image (1).png')` }}
       />
       <Link
-        type="button"
-        onClick={handleSignOut}
         to="/"
         className="absolute top-4 right-4 px-4 py-2 text-sm bg-red-500 text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 rounded z-20"
+        onClick={handleSignOut}
       >
         Sign Out
       </Link>
