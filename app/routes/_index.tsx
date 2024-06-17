@@ -15,7 +15,7 @@ export { default as NewDetail } from './newdetail.$postId';
 // Meta function for setting the page metadata
 export const meta: MetaFunction = () => {
   return [
-    { title: "Image Search App" },
+    { title: "Blog Search App" },
     {
       name: "description",
       content: "Search for images using Unsplash API and Supabase",
