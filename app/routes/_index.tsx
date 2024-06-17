@@ -1,11 +1,16 @@
 // Import necessary components and hooks
 import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useLoaderData, Form, useNavigation, Link } from "@remix-run/react";
+import { useLoaderData, Form, Link } from "@remix-run/react";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { useState } from "react";
 import { getSupabase } from "~/supabaseclient";
+import { useNavigate } from 'react-router-dom'; // Import useNavigate from React Router
+// routes/index.ts
+
+export { default as NewDetail } from './newdetail.$postId';
+
 
 // Meta function for setting the page metadata
 export const meta: MetaFunction = () => {
@@ -62,7 +67,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 // Main component
 export default function Component() {
   const { unsplashData, supabaseData } = useLoaderData();
-  const navigation = useNavigation();
+  const navigate = useNavigate(); // Use navigate from React Router
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedPostId, setExpandedPostId] = useState<string | null>(null);
 
@@ -84,6 +89,11 @@ export default function Component() {
     if (event.key === "Enter") {
       togglePostExpansion(postId);
     }
+  };
+
+  // Function to handle exploring a Supabase post (redirect to detail page)
+  const handleExploreSupabase = (postId: string) => {
+    navigate(`/newdetail/${postId}`);
   };
 
   return (
@@ -126,7 +136,7 @@ export default function Component() {
                 type="submit"
                 className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-gray-900 px-6 py-2 text-white hover:bg-gray-800 focus:outline-none"
               >
-                {navigation.state === "submitting" ? "Searching..." : "Search"}
+                Search
               </Button>
             </Form>
           </div>
@@ -161,7 +171,7 @@ export default function Component() {
                   src={photo.urls.small}
                   alt={photo.alt_description}
                   className="w-full h-96 object-cover rounded-t-lg cursor-pointer"
-                  onClick={() => navigation.navigate(`/detail/${photo.id}`)}
+                  onClick={() => navigate(`/detail/${photo.id}`)}
                   onKeyPress={(e) => handleKeyPress(e, photo.id)}
                   tabIndex={0}
                 />
@@ -207,24 +217,14 @@ export default function Component() {
                       {post.heading}
                     </h3>
                     {expandedPostId === post.id ? (
-                      <div>
-                        <div
-                          dangerouslySetInnerHTML={{ __html: post.content }}
-                        />
-                        <div className="flex justify-center mt-2">
-                          <Button
-                            className="bg-gray-900 text-white px-4 py-2 rounded-md focus:outline-none"
-                            onClick={() => togglePostExpansion(post.id)}
-                          >
-                            Hide Content
-                          </Button>
-                        </div>
-                      </div>
+                      <div
+                        dangerouslySetInnerHTML={{ __html: post.content }}
+                      />
                     ) : (
                       <div className="flex justify-center">
                         <Button
                           className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md focus:outline-none"
-                          onClick={() => togglePostExpansion(post.id)}
+                          onClick={() => handleExploreSupabase(post.id)}
                         >
                           Explore
                         </Button>
@@ -237,8 +237,8 @@ export default function Component() {
           ) : (
             <p className="text-gray-800">No results found from Supabase.</p>
           )}
+          </div>
         </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
