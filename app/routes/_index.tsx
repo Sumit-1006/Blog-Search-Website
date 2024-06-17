@@ -6,11 +6,10 @@ import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { useState } from "react";
 import { getSupabase } from "~/supabaseclient";
-import { useNavigate } from 'react-router-dom'; // Import useNavigate from React Router
+import { useNavigate } from "react-router-dom"; // Import useNavigate from React Router
 // routes/index.ts
 
-export { default as NewDetail } from './newdetail.$postId';
-
+export { default as NewDetail } from "./newdetail.$postId";
 
 // Meta function for setting the page metadata
 export const meta: MetaFunction = () => {
@@ -153,6 +152,47 @@ export default function Component() {
       </div>
       <div className="relative z-10 mt-8 px-4 md:px-6 lg:px-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+
+        {supabaseData.length > 0 ? (
+            supabaseData.map((post: any) => (
+              <div
+                key={post.id}
+                className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
+              >
+                <div
+                  className="relative overflow-hidden rounded-t-lg cursor-pointer"
+                  onClick={() => togglePostExpansion(post.id)}
+                  onKeyPress={(e) => handleKeyPress(e, post.id)}
+                  tabIndex={0}
+                >
+                  <img
+                    src={post.image_url}
+                    alt={post.heading}
+                    className="w-full h-96 object-cover"
+                  />
+                  <div className="p-4 bg-gray-600 text-white">
+                    <h3 className="text-lg font-bold mb-2 text-center capitalize">
+                      {post.heading}
+                    </h3>
+                    {expandedPostId === post.id ? (
+                      <div dangerouslySetInnerHTML={{ __html: post.content }} />
+                    ) : (
+                      <div className="flex justify-center">
+                        <Button
+                          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md focus:outline-none"
+                          onClick={() => handleExploreSupabase(post.id)}
+                        >
+                          Explore
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-800"></p>
+          )}
           {/* Display results from Unsplash API */}
           {unsplashData.results && unsplashData.results.length > 0 ? (
             unsplashData.results.map((photo: any) => (
@@ -188,50 +228,9 @@ export default function Component() {
           )}
 
           {/* Display results from Supabase database */}
-          {supabaseData.length > 0 ? (
-            supabaseData.map((post: any) => (
-              <div
-                key={post.id}
-                className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
-              >
-                <div
-                  className="relative overflow-hidden rounded-t-lg cursor-pointer"
-                  onClick={() => togglePostExpansion(post.id)}
-                  onKeyPress={(e) => handleKeyPress(e, post.id)}
-                  tabIndex={0}
-                >
-                  <img
-                    src={post.image_url}
-                    alt={post.heading}
-                    className="w-full h-96 object-cover"
-                  />
-                  <div className="p-4 bg-gray-600 text-white">
-                    <h3 className="text-lg font-bold mb-2 text-center capitalize">
-                      {post.heading}
-                    </h3>
-                    {expandedPostId === post.id ? (
-                      <div
-                        dangerouslySetInnerHTML={{ __html: post.content }}
-                      />
-                    ) : (
-                      <div className="flex justify-center">
-                        <Button
-                          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md focus:outline-none"
-                          onClick={() => handleExploreSupabase(post.id)}
-                        >
-                          Explore
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))
-          ) : (
-            <p className="text-gray-800"></p>
-          )}
-          </div>
+          
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
