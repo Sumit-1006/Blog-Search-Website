@@ -6,6 +6,7 @@ import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { getSupabase } from "~/supabaseclient";
 import { ActionFunction } from "@remix-run/node";
+import { Link } from "react-router-dom";
 
 
 
@@ -64,7 +65,7 @@ export default function LoginComponent() {
               </div>
             </CardContent>
             <CardFooter className="flex justify-between">
-              <Button variant="outline" className="px-6 py-3 text-lg" onClick={handleGoBack}>Go Back</Button>
+              <Link to="/"  className="px-6 py-3 text-lg" onClick={handleGoBack}>Go Back</Link>
               <Button type="submit" className="px-6 py-3 text-lg bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">Sign In</Button>
             </CardFooter>
           </Card>
