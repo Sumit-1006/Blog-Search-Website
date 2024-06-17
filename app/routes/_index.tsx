@@ -141,14 +141,7 @@ export default function Component() {
             </Form>
           </div>
         </div>
-        <div className="absolute top-4 right-4 flex space-x-2">
-          <Link
-            to="/adminsignup"
-            className="inline-flex items-center rounded-full bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 focus:outline-none"
-            prefetch="none"
-          >
-            Admin Sign up
-          </Link>
+        <div className="absolute top-4 right-4">
           <Link
             to="/adminlogin"
             className="inline-flex items-center rounded-full bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 focus:outline-none"
@@ -191,7 +184,7 @@ export default function Component() {
               </div>
             ))
           ) : (
-            <p className="text-gray-800">No results found from Unsplash.</p>
+            <p className="text-gray-800"></p>
           )}
 
           {/* Display results from Supabase database */}
@@ -235,7 +228,7 @@ export default function Component() {
               </div>
             ))
           ) : (
-            <p className="text-gray-800">No results found from Supabase.</p>
+            <p className="text-gray-800"></p>
           )}
           </div>
         </div>
