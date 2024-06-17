@@ -1,10 +1,14 @@
+// app/routes/adminlogin.tsx
+import { json, Form, useNavigate, redirect, useActionData } from "@remix-run/react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "~/components/ui/card";
 import { Label } from "~/components/ui/label";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
-import { json, Form, useNavigate, redirect, useActionData } from "@remix-run/react";
-import { ActionFunction } from "@remix-run/node";
 import { getSupabase } from "~/supabaseclient";
+import { ActionFunction } from "@remix-run/node";
+
+
+
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
@@ -12,16 +16,22 @@ export const action: ActionFunction = async ({ request }) => {
   const password = formData.get("password") as string;
 
   const supabase = getSupabase();
-
-  // Sign in the user
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  const { user, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
 
   if (error) {
+    console.error("Sign In Error:", error.message); // Log the error
     return json({ error: error.message }, { status: 400 });
   }
 
-  return redirect("/afterlogin"); // Redirect to the desired page after successful login
+  console.log("User signed in successfully:", user); // Log successful sign-in
+
+  return redirect("/afterlogin"); // Redirect to the afterlogin page after successful login
 };
+
+
 
 export default function LoginComponent() {
   const actionData = useActionData<typeof action>();
