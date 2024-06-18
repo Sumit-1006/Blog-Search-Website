@@ -54,6 +54,7 @@ export default function AfterLogin() {
   const { recentBlogs } = useLoaderData();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+  const [displaySearch, setDisplaySearch] = useState(false); // State to toggle search form
   const [blogs, setBlogs] = useState<any[]>([]);
   const [blogHistory, setBlogHistory] = useState<any[]>([]);
 
@@ -94,6 +95,12 @@ export default function AfterLogin() {
     } else {
       setBlogs(searchResults);
     }
+    // Hide the search form after performing the search
+    setDisplaySearch(false);
+  };
+
+  const toggleSearch = () => {
+    setDisplaySearch((prevState) => !prevState);
   };
 
   return (
@@ -223,3 +230,4 @@ export default function AfterLogin() {
     </div>
   );
 }
+
