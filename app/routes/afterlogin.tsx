@@ -1,4 +1,3 @@
-// Import necessary components and hooks
 import { json, Form, useActionData, useLoaderData } from "@remix-run/react";
 import { getSupabase } from "~/supabaseclient";
 import { Link, useNavigate } from "react-router-dom";
@@ -7,57 +6,39 @@ import { useState, useEffect } from "react";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 
-// Loader function to fetch recent blogs and search results
-export const loader: LoaderFunction = async ({ request }) => {
-  const url = new URL(request.url);
-  const query = url.searchParams.get("query");
-
+export const loader: LoaderFunction = async () => {
   const supabase = getSupabase();
-  let recentBlogs = [];
-  let searchResults = [];
-
-  if (query) {
-    const { data: searchData, error: searchError } = await supabase
-      .from("posts")
-      .select("*")
-      .ilike("heading", `%${query}%`);
-    if (searchError) {
-      console.error("Error searching blogs:", searchError.message);
-    } else {
-      searchResults = searchData;
-    }
-  }
-
-  const { data: blogs, error: blogsError } = await supabase
+  const { data: recentBlogs, error } = await supabase
     .from("posts")
     .select("*")
     .order("created_at", { ascending: false })
     .limit(16);
 
-  if (blogsError) {
-    console.error("Error fetching recent blogs:", blogsError.message);
-  } else {
-    recentBlogs = blogs;
+  if (error) {
+    console.error("Error fetching recent blogs:", error.message);
+    return json({ recentBlogs: [], searchResults: [] });
   }
 
-  return json({ recentBlogs, searchResults });
+  return json({ recentBlogs, searchResults: [] });
 };
 
-// Action function to add new blog data
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
   const imageUrl = formData.get("image-url") as string;
   const heading = formData.get("heading") as string;
   const content = formData.get("content") as string;
 
+  // Check if any field is empty
   if (!imageUrl.trim() || !heading.trim() || !content.trim()) {
-    return json({ error: "Please fill all fields" }, { status: 400 });
+    return json({ error: "Please fill the empty columns" }, { status: 400 });
   }
 
   const supabase = getSupabase();
   const { error } = await supabase
     .from("posts")
-    .insert([{ image_url: imageUrl, heading, content, created_at: new Date() }]);
+    .insert([
+      { image_url: imageUrl, heading, content, created_at: new Date() },
+    ]);
 
   if (error) {
     console.error("Supabase Insert Error:", error.message);
@@ -67,23 +48,21 @@ export const action: ActionFunction = async ({ request }) => {
   return json({ success: "New Blog Added" });
 };
 
-// Main component
 export default function AfterLogin() {
   const actionData = useActionData();
-  const { recentBlogs, searchResults } = useLoaderData();
+  const { recentBlogs } = useLoaderData();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
-  const [blogs, setBlogs] = useState<any[]>([]);
-  const [blogHistory, setBlogHistory] = useState<any[]>([]);
+  const [displaySearch, setDisplaySearch] = useState(false);
+  const [blogs, setBlogs] = useState<any[]>([]); // State to hold displayed blogs
+  const [blogHistory, setBlogHistory] = useState<any[]>([]); // State to hold blog history
 
   useEffect(() => {
-    if (searchResults && searchResults.length > 0) {
-      setBlogs(searchResults);
-    } else {
+    if (recentBlogs) {
       setBlogs(recentBlogs);
+      setBlogHistory(recentBlogs); // Initialize blog history when recentBlogs changes
     }
-    setBlogHistory(recentBlogs);
-  }, [recentBlogs, searchResults]);
+  }, [recentBlogs]);
 
   const handleSignOut = async () => {
     const supabase = getSupabase();
@@ -98,23 +77,36 @@ export default function AfterLogin() {
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Check if any field is empty
     if (!searchQuery.trim()) {
-      alert("Please enter a search query");
+      alert("Please fill the empty columns");
       return;
     }
 
-    navigate(`?query=${searchQuery}`);
+    const supabase = getSupabase();
+    const { data: searchResults, error } = await supabase
+      .from("posts")
+      .select("*")
+      .ilike("heading", `%${searchQuery}%`);
+
+    if (error) {
+      console.error("Error searching blogs:", error.message);
+    } else {
+      setBlogs(searchResults);
+    }
+    // Hide the search results after performing the search
+    setDisplaySearch(false);
   };
 
   const toggleSearch = () => {
-    setSearchQuery("");
-    navigate(`/afterlogin`);
+    setDisplaySearch((prevState) => !prevState);
   };
 
   return (
     <div className="relative w-full h-screen bg-gray-200 flex">
+      {/* Sidebar with Blog History */}
       <div className="bg-gray-900 text-white w-1/5 py-8 px-4 z-10">
-        <h2 className="text-2xl font-bold mb-4">Recently Added</h2>
+        <h2 className="text-2xl font-bold mb-4">Blog History</h2>
         <ul>
           {blogHistory.slice(0, 7).map((post: any) => (
             <li
@@ -128,11 +120,13 @@ export default function AfterLogin() {
         </ul>
       </div>
 
+      {/* Background Image with Blur Effect */}
       <div
         className="absolute inset-0 z-0 bg-cover bg-center"
         style={{ backgroundImage: 'url("image (1).png")', filter: "blur(8px)" }}
       ></div>
 
+      {/* Main Content Area */}
       <div className="flex-1 relative z-10 px-4 md:px-6 lg:px-8 flex justify-center items-center">
         <div className="absolute top-4 right-4">
           <Link
@@ -150,7 +144,7 @@ export default function AfterLogin() {
         )}
         <div className="max-w-4xl w-full p-6 bg-white bg-opacity-70 rounded-lg shadow-lg">
           <h2 className="text-2xl font-bold mb-6 text-center">
-            Enter New Blog Data
+            Enter the New Data
           </h2>
           <Form method="post">
             <div className="space-y-6">
@@ -194,7 +188,7 @@ export default function AfterLogin() {
                 type="submit"
                 className="px-6 py-3 text-lg bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                Add Blog
+                Add Data
               </button>
             </div>
           </Form>
@@ -207,44 +201,29 @@ export default function AfterLogin() {
               className="px-6 py-3 text-lg bg-gray-900 text-white hover:bg-gray-800 focus:outline-none"
               onClick={toggleSearch}
             >
-              Clear Search
+              Search Blog
             </button>
           </div>
-          <Form onSubmit={handleSearch} className="mt-6">
-            <div className="relative flex items-center">
-              <Input
-                name="search"
-                type="search"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search blogs..."
-                className="w-full h-12 px-6 py-4 text-lg rounded-full bg-white/90 text-gray-900 focus focus"
-              />
-              <Button
-                type="submit"
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-gray-900 px-6 py-2 text-white hover:bg-gray-800 focus:outline-none"
-              >
-                Search
-              </Button>
-            </div>
-          </Form>
-          <div className="mt-6">
-            {blogs.map((post: any) => (
-              <div
-                key={post.id}
-                className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300 mb-4"
-                onClick={() => navigate(`/newdetail/${post.id}`)}
-              >
-                <div className="p-4">
-                  <h3 className="text-lg font-bold mb-2">{post.heading}</h3>
-                  <p className="text-gray-800">{post.content}</p>
-                </div>
+          {displaySearch && (
+            <form onSubmit={handleSearch} className="mt-6">
+              <div className="relative flex items-center">
+                <Input
+                  name="search"
+                  type="search"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search blogs..."
+                  className="w-full h-12 px-6 py-4 text-lg rounded-full bg-white/90 text-gray-900 focus focus"
+                />
+                <Button
+                  type="submit"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-gray-900 px-6 py-2 text-white hover:bg-gray-800 focus:outline-none"
+                >
+                  Search
+                </Button>
               </div>
-            ))}
-            {blogs.length === 0 && (
-              <p className="text-center text-gray-800">No blogs found</p>
-            )}
-          </div>
+            </form>
+          )}
         </div>
       </div>
     </div>
