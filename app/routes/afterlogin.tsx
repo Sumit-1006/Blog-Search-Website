@@ -10,30 +10,38 @@ export const loader: LoaderFunction = async ({ request }) => {
   const url = new URL(request.url);
   const query = url.searchParams.get("query");
 
-  if (!query) {
-    return json({ unsplashData: { results: [] }, supabaseData: [] });
+  // Fetch recent blogs from Supabase
+  const supabase = getSupabase();
+  const { data: recentBlogs, error: recentBlogsError } = await supabase
+    .from("posts")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(7);
+
+  if (recentBlogsError) {
+    throw new Error(`Error fetching recent blogs from Supabase: ${recentBlogsError.message}`);
   }
 
   // Fetch data from Unsplash API
-  const unsplashResponse = await fetch(
-    `https://api.unsplash.com/search/photos?page=1&per_page=30&query=${query}`,
-    {
-      headers: {
-        Authorization: "Client-ID Sahsc_dhXRNry03wAoExe_vHRMHKuNa6JT8_KFn3mOA",
-      },
-    }
-  );
-
-  if (!unsplashResponse.ok) {
-    throw new Error(
-      `Error fetching photos from Unsplash: ${unsplashResponse.statusText}`
+  let unsplashData = { results: [] };
+  if (query) {
+    const unsplashResponse = await fetch(
+      `https://api.unsplash.com/search/photos?page=1&per_page=30&query=${query}`,
+      {
+        headers: {
+          Authorization: "Client-ID Sahsc_dhXRNry03wAoExe_vHRMHKuNa6JT8_KFn3mOA",
+        },
+      }
     );
+
+    if (!unsplashResponse.ok) {
+      throw new Error(`Error fetching photos from Unsplash: ${unsplashResponse.statusText}`);
+    }
+
+    unsplashData = await unsplashResponse.json();
   }
 
-  const unsplashData = await unsplashResponse.json();
-
-  // Fetch data from Supabase database (example assumes 'posts' table)
-  const supabase = getSupabase();
+  // Fetch data from Supabase database for the main search
   const { data: supabaseData, error } = await supabase
     .from("posts")
     .select("*")
@@ -43,8 +51,10 @@ export const loader: LoaderFunction = async ({ request }) => {
     throw new Error(`Error fetching posts from Supabase: ${error.message}`);
   }
 
-  return json({ unsplashData, supabaseData });
+  return json({ unsplashData, supabaseData, recentBlogs });
 };
+
+
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
@@ -73,18 +83,14 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 export default function AfterLogin() {
-  const { unsplashData, supabaseData } = useLoaderData();
-  //const navigate = useNavigate(); // Use navigate from React Router
-  //const [searchQuery, setSearchQuery] = useState("");
-  const [expandedPostId, setExpandedPostId] = useState<string | null>(null);
-
+  const { unsplashData, supabaseData, recentBlogs } = useLoaderData();
   const actionData = useActionData();
-  const { recentBlogs } = useLoaderData();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [displaySearch, setDisplaySearch] = useState(false);
   const [blogs, setBlogs] = useState<any[]>([]);
   const [blogHistory, setBlogHistory] = useState<any[]>([]);
+  const [expandedPostId, setExpandedPostId] = useState<string | null>(null);
 
   useEffect(() => {
     if (recentBlogs) {
@@ -129,18 +135,14 @@ export default function AfterLogin() {
     setDisplaySearch((prevState) => !prevState);
   };
 
-  //hello
-
   const handleClearSearch = () => {
     setSearchQuery("");
   };
 
-  // Function to toggle expanded state of a post
   const togglePostExpansion = (postId: string) => {
     setExpandedPostId((prevId) => (prevId === postId ? null : postId));
   };
 
-  // Handle key press event for accessibility
   const handleKeyPress = (
     event: React.KeyboardEvent<HTMLDivElement>,
     postId: string
@@ -150,7 +152,6 @@ export default function AfterLogin() {
     }
   };
 
-  // Function to handle exploring a Supabase post (redirect to detail page)
   const handleExploreSupabase = (postId: string) => {
     navigate(`/newdetail/${postId}`);
   };
@@ -163,21 +164,20 @@ export default function AfterLogin() {
         className="absolute inset-0 w-full h-full object-cover filter blur-sm"
       />
       <div className="relative w-full h-screen flex">
-      <div className="bg-gray-900 text-white w-1/5 py-8 px-4 z-10 h-screen overflow-y-auto">
-        <h2 className="text-2xl font-bold mb-4">Blog History</h2>
-        <ul>
-          {blogHistory.slice(0, 7).map((post: any) => (
-            <li
-              key={post.id}
-              className="mb-4 cursor-pointer hover:underline list-disc list-inside"
-              onClick={() => navigate(`/newdetail/${post.id}`)}
-            >
-              {post.heading}
-            </li>
-          ))}
-        </ul>
-      </div>
-
+        <div className="bg-gray-900 text-white w-1/5 py-8 px-4 z-10 h-screen overflow-y-auto">
+          <h2 className="text-2xl font-bold mb-4">Blog History</h2>
+          <ul>
+            {blogHistory.slice(0, 7).map((post: any) => (
+              <li
+                key={post.id}
+                className="mb-4 cursor-pointer hover:underline list-disc list-inside"
+                onClick={() => navigate(`/newdetail/${post.id}`)}
+              >
+                {post.heading}
+              </li>
+            ))}
+          </ul>
+        </div>
 
         <div className="flex-1 relative z-10 px-4 md:px-6 lg:px-8 flex justify-center items-center">
           <div className="absolute top-4 right-4">
@@ -249,9 +249,9 @@ export default function AfterLogin() {
             )}
             <br />
             <div>
-              <Form method="get" className="relative">
+              <Form method="get" className="relative" onSubmit={handleSearch}>
                 <div className="relative flex items-center">
-                  <Input
+                  <input
                     name="query"
                     type="search"
                     value={searchQuery}
@@ -260,105 +260,105 @@ export default function AfterLogin() {
                     className="w-full h-12 px-6 py-4 text-lg rounded-full bg-white/90 text-gray-900 focus:bg-white focus:outline-none"
                   />
                   {searchQuery && (
-                    <Button
+                    <button
                       type="button"
                       className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-800 focus:outline-none"
                       onClick={handleClearSearch}
                     >
-                      Clear
-                    </Button>
+                      &times;
+                    </button>
                   )}
                 </div>
-                <Button
+                <button
                   type="submit"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-gray-900 px-6 py-2 text-white hover:bg-gray-800 focus:outline-none"
+                  className="absolute right-0 top-0 h-12 px-6 text-lg font-semibold text-white bg-blue-500 rounded-full hover:bg-blue-600 focus:outline-none"
                 >
                   Search
-                </Button>
+                </button>
               </Form>
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold my-6 text-center">Recent Blogs</h2>
+              <div>
+                {blogs.map((post) => (
+                  <div
+                    key={post.id}
+                    className={`mb-4 p-4 border rounded-lg ${
+                      expandedPostId === post.id ? "bg-gray-100" : ""
+                    }`}
+                  >
+                    <div
+                      className="cursor-pointer"
+                      onClick={() => togglePostExpansion(post.id)}
+                      onKeyDown={(event) =>
+                        handleKeyPress(event, post.id)
+                      }
+                      tabIndex={0}
+                      role="button"
+                    >
+                      <h3 className="text-xl font-semibold mb-2">
+                        {post.heading}
+                      </h3>
+                      {expandedPostId === post.id && (
+                        <div>
+                          <img
+                            src={post.image_url}
+                            alt={post.heading}
+                            className="w-full h-64 object-cover mb-4 rounded-lg"
+                          />
+                          <p>{post.content}</p>
+                        </div>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      className="mt-2 text-blue-500 hover:underline"
+                      onClick={() => handleExploreSupabase(post.id)}
+                    >
+                      Read More
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div className="relative z-10 mt-8 px-4 md:px-6 lg:px-8 ">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {supabaseData.length > 0 ? (
-            supabaseData.map((post: any) => (
-              <div
-                key={post.id}
-                className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
-              >
-                <div
-                  className="relative overflow-hidden rounded-t-lg cursor-pointer"
-                  onClick={() => togglePostExpansion(post.id)}
-                  onKeyPress={(e) => handleKeyPress(e, post.id)}
-                  tabIndex={0}
-                >
-                  <img
-                    src={post.image_url}
-                    alt={post.heading}
-                    className="w-full h-96 object-cover"
-                  />
-                  <div className="p-4 bg-gray-600 text-white">
-                    <h3 className="text-lg font-bold mb-2 text-center capitalize">
-                      {post.heading}
-                    </h3>
-                    {expandedPostId === post.id ? (
-                      <div dangerouslySetInnerHTML={{ __html: post.content }} />
-                    ) : (
-                      <div className="flex justify-center">
-                        <Button
-                          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md focus:outline-none"
-                          onClick={() => handleExploreSupabase(post.id)}
-                        >
-                          Explore
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))
-          ) : (
-            <p className="text-gray-800"></p>
-          )}
-          {/* Display results from Unsplash API */}
-          {unsplashData.results && unsplashData.results.length > 0 ? (
-            unsplashData.results.map((photo: any) => (
-              <div
-                key={photo.id}
-                className="relative overflow-hidden rounded-lg shadow-md bg-gray-400 hover:scale-105 transition-transform duration-300"
-              >
-                <img
-                  src={photo.urls.small}
-                  alt={photo.alt_description}
-                  className="w-full h-96 object-cover rounded-t-lg cursor-pointer"
-                  onClick={() => navigate(`/detail/${photo.id}`)}
-                  onKeyPress={(e) => handleKeyPress(e, photo.id)}
-                  tabIndex={0}
-                />
-                <div className="p-4 bg-gray-600 text-white">
-                  <h3 className="text-lg font-bold mb-2 text-center capitalize">
-                    {photo.alt_description}
-                  </h3>
-                  <div className="flex justify-center">
-                    <Link
-                      to={`/detail/${photo.id}`}
-                      className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md focus:outline-none"
+        {displaySearch && (
+          <div className="absolute inset-0 bg-black bg-opacity-50 flex justify-center items-center z-20">
+            <div className="bg-white w-full max-w-2xl p-8 rounded-lg shadow-lg">
+              <h2 className="text-2xl font-bold mb-6 text-center">
+                Search Results
+              </h2>
+              <div>
+                {supabaseData?.length > 0 ? (
+                  supabaseData.map((post) => (
+                    <div
+                      key={post.id}
+                      className="mb-4 p-4 border rounded-lg cursor-pointer"
+                      onClick={() => navigate(`/newdetail/${post.id}`)}
                     >
-                      Explore
-                    </Link>
-                  </div>
-                </div>
+                      <h3 className="text-xl font-semibold mb-2">
+                        {post.heading}
+                      </h3>
+                      <p>{post.content}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-center">No results found.</p>
+                )}
               </div>
-            ))
-          ) : (
-            <p className="text-gray-800"></p>
-          )}
-
-          {/* Display results from Supabase database */}
-        </div>
+              <button
+                type="button"
+                className="mt-4 px-6 py-3 text-lg bg-red-500 text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+                onClick={toggleSearch}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 }
+
