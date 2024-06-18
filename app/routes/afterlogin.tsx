@@ -6,7 +6,8 @@ import { useState, useEffect } from "react";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 
-export const loader: LoaderFunction = async () => {
+// Loader function to fetch recent blogs
+export const loader: LoaderFunction = async ({ request }) => {
   const supabase = getSupabase();
   const { data: recentBlogs, error } = await supabase
     .from("posts")
@@ -22,6 +23,7 @@ export const loader: LoaderFunction = async () => {
   return json({ recentBlogs, searchResults: [] });
 };
 
+// Action function to handle new blog creation
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
   const imageUrl = formData.get("image-url") as string;
@@ -48,6 +50,7 @@ export const action: ActionFunction = async ({ request }) => {
   return json({ success: "New Blog Added" });
 };
 
+// AfterLogin component
 export default function AfterLogin() {
   const actionData = useActionData();
   const { recentBlogs } = useLoaderData();
@@ -106,7 +109,7 @@ export default function AfterLogin() {
     <div className="relative w-full h-screen bg-gray-200 flex">
       {/* Sidebar with Blog History */}
       <div className="bg-gray-900 text-white w-1/5 py-8 px-4 z-10">
-        <h2 className="text-2xl font-bold mb-4">Blog History</h2>
+        <h2 className="text-2xl font-bold mb-4">Recently Added</h2>
         <ul>
           {blogHistory.slice(0, 7).map((post: any) => (
             <li
@@ -213,7 +216,7 @@ export default function AfterLogin() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search blogs..."
-                  className="w-full h-12 px-6 py-4 text-lg rounded-full bg-white/90 text-gray-900 focus focus"
+                  className="w-full h-12 px-6 py-4 text-lg rounded-full bg-white/90 text-gray-900 focus:bg-white focus:outline-none"
                 />
                 <Button
                   type="submit"
@@ -224,6 +227,34 @@ export default function AfterLogin() {
               </div>
             </form>
           )}
+          <div className="mt-8">
+            {blogs.length > 0 ? (
+              blogs.map((post) => (
+                <div
+                  key={post.id}
+                  className="bg-white shadow-md rounded-lg overflow-hidden mb-4"
+                >
+                  <img
+                    src={post.image_url}
+                    alt={post.heading}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="p-4">
+                    <h3 className="text-lg font-bold mb-2">{post.heading}</h3>
+                    <p className="text-gray-700">{post.content}</p>
+                    <Link
+                      to={`/newdetail/${post.id}`}
+                      className="text-blue-500 hover:underline mt-2 block"
+                    >
+                      Read more
+                    </Link>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-800 mt-4">No blogs found.</p>
+            )}
+          </div>
         </div>
       </div>
     </div>
