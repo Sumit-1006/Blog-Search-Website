@@ -152,8 +152,7 @@ export default function Component() {
       </div>
       <div className="relative z-10 mt-8 px-4 md:px-6 lg:px-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-
-        {supabaseData.length > 0 ? (
+          {supabaseData.length > 0 ? (
             supabaseData.map((post: any) => (
               <div
                 key={post.id}
@@ -228,7 +227,6 @@ export default function Component() {
           )}
 
           {/* Display results from Supabase database */}
-          
         </div>
       </div>
     </div>
