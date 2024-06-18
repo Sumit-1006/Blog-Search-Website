@@ -88,16 +88,22 @@ export default function AfterLogin() {
   return (
     <div className="relative w-full h-screen bg-gray-200 flex">
       {/* Sidebar with Blog History */}
-      <div className="bg-gray-900 text-white w-1/5 py-8 px-4">
-        <h2 className="text-2xl font-bold mb-4">Blog History</h2>
-        <ul>
-          {blogHistory.map((post: any) => (
-            <li key={post.id} className="mb-4 cursor-pointer" onClick={() => navigate(`/newdetail/${post.id}`)}>
-              {post.heading}
-            </li>
-          ))}
-        </ul>
-      </div>
+      {/* Sidebar with Blog History */}
+<div className="bg-gray-900 text-white w-1/5 py-8 px-4">
+  <h2 className="text-2xl font-bold mb-4">Blog History</h2>
+  <ul>
+    {blogHistory.slice(0, 7).map((post: any) => (
+      <li
+        key={post.id}
+        className="mb-4 cursor-pointer hover:underline list-disc list-inside"
+        onClick={() => navigate(`/newdetail/${post.id}`)}
+      >
+        {post.heading}
+      </li>
+    ))}
+  </ul>
+</div>
+
 
       {/* Main Content Area */}
       <div className="flex-1 relative z-10 px-4 md:px-6 lg:px-8 flex justify-center items-center">
