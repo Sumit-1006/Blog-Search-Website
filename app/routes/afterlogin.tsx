@@ -30,7 +30,7 @@ export const action: ActionFunction = async ({ request }) => {
 
   const supabase = getSupabase();
   const { error } = await supabase.from("posts").insert([
-    { image_url: imageUrl, heading, content, created_at: new Date() },
+    { image_url: imageUrl, heading, content, created_at: new Date() }
   ]);
 
   if (error) {
@@ -47,17 +47,13 @@ export default function AfterLogin() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [displaySearch, setDisplaySearch] = useState(false);
-  const [blogs, setBlogs] = useState<any[]>([]);
-  const [blogHistory, setBlogHistory] = useState<any[]>([]); // This state stores blog data
+  const [blogs, setBlogs] = useState<any[]>([]); // State to hold displayed blogs
+  const [blogHistory, setBlogHistory] = useState<any[]>([]); // State to hold blog history
 
   useEffect(() => {
     if (recentBlogs) {
       setBlogs(recentBlogs);
-      console.log("Recent Blogs:", recentBlogs);
-      
-      // Assuming recentBlogs is an array of BlogPost objects
-      setBlogHistory((prevBlogHistory) => [...prevBlogHistory, ...recentBlogs]);
-      console.log("Updated Blog History:", blogHistory);
+      setBlogHistory(recentBlogs); // Initialize blog history when recentBlogs changes
     }
   }, [recentBlogs]);
 
@@ -85,29 +81,23 @@ export default function AfterLogin() {
     } else {
       setBlogs(searchResults);
     }
+    // Hide the search results after performing the search
     setDisplaySearch(false);
   };
 
   return (
     <div className="relative w-full h-screen bg-gray-200 flex">
       {/* Sidebar with Blog History */}
-      <div className="bg-gray-900 text-white w-1/5 py-8 px-4 overflow-y-auto">
+      <div className="bg-gray-900 text-white w-1/5 py-8 px-4">
         <h2 className="text-2xl font-bold mb-4">Blog History</h2>
         <ul>
-          {blogHistory.map((posts: any) => (
-            <li key={posts.id} className="mb-4">
-              <Button
-                to="/"
-                //onKeyDown={(e) => e.key === "Enter" && navigate(`/newdetail/${post.id}`)}
-                className="w-full text-left text-white hover:underline"
-              >
-                {posts.heading} {/* Display only the heading property from each blog post */}
-              </Button>
+          {blogHistory.map((post: any) => (
+            <li key={post.id} className="mb-4 cursor-pointer" onClick={() => navigate(`/newdetail/${post.id}`)}>
+              {post.heading}
             </li>
           ))}
         </ul>
       </div>
-
 
       {/* Main Content Area */}
       <div className="flex-1 relative z-10 px-4 md:px-6 lg:px-8 flex justify-center items-center">
