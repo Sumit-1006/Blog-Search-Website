@@ -165,7 +165,7 @@ export default function AfterLogin() {
       />
       <div className="relative w-full h-screen flex">
         <div className="bg-gray-900 text-white w-1/5 py-8 px-4 z-10 h-screen overflow-y-auto">
-          <h2 className="text-2xl font-bold mb-4">Blog History</h2>
+          <h2 className="text-2xl font-bold mb-4">Recently Added</h2>
           <ul>
             {blogHistory.slice(0, 7).map((post: any) => (
               <li
