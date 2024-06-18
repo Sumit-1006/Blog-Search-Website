@@ -1,3 +1,4 @@
+// Import necessary components and hooks
 import { json, Form, useActionData, useLoaderData } from "@remix-run/react";
 import { getSupabase } from "~/supabaseclient";
 import { Link, useNavigate } from "react-router-dom";
@@ -53,9 +54,8 @@ export default function AfterLogin() {
   const { recentBlogs } = useLoaderData();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
-  const [displaySearch, setDisplaySearch] = useState(false);
-  const [blogs, setBlogs] = useState<any[]>([]); // State to hold displayed blogs
-  const [blogHistory, setBlogHistory] = useState<any[]>([]); // State to hold blog history
+  const [blogs, setBlogs] = useState<any[]>([]);
+  const [blogHistory, setBlogHistory] = useState<any[]>([]);
 
   useEffect(() => {
     if (recentBlogs) {
@@ -94,12 +94,6 @@ export default function AfterLogin() {
     } else {
       setBlogs(searchResults);
     }
-    // Hide the search results after performing the search
-    setDisplaySearch(false);
-  };
-
-  const toggleSearch = () => {
-    setDisplaySearch((prevState) => !prevState);
   };
 
   return (
