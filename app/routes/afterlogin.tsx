@@ -163,20 +163,21 @@ export default function AfterLogin() {
         className="absolute inset-0 w-full h-full object-cover filter blur-sm"
       />
       <div className="relative w-full h-screen flex">
-        <div className="bg-gray-900 text-white w-1/5 py-8 px-4 z-10 h-screen overflow-y-auto">
-          <h2 className="text-2xl font-bold mb-4">Blog History</h2>
-          <ul>
-            {blogHistory.slice(0, 7).map((post: any) => (
-              <li
-                key={post.id}
-                className="mb-4 cursor-pointer hover:underline list-disc list-inside"
-                onClick={() => navigate(`/newdetail/${post.id}`)}
-              >
-                {post.heading}
-              </li>
-            ))}
-          </ul>
-        </div>
+      <div className="bg-gray-900 text-white w-1/5 py-8 px-4 z-10 h-screen overflow-y-auto">
+        <h2 className="text-2xl font-bold mb-4">Blog History</h2>
+        <ul>
+          {blogHistory.slice(0, 7).map((post: any) => (
+            <li
+              key={post.id}
+              className="mb-4 cursor-pointer hover:underline list-disc list-inside"
+              onClick={() => navigate(`/newdetail/${post.id}`)}
+            >
+              {post.heading}
+            </li>
+          ))}
+        </ul>
+      </div>
+
 
         <div className="flex-1 relative z-10 px-4 md:px-6 lg:px-8 flex justify-center items-center">
           <div className="absolute top-4 right-4">
