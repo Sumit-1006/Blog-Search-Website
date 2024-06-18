@@ -156,7 +156,7 @@ export default function AfterLogin() {
   };
 
   return (
-    <div className="relative w-full h-screen bg-gray-200">
+    <div className="relative w-full h-screen">
       <img
         src="/image (1).png"
         alt="Blog"
