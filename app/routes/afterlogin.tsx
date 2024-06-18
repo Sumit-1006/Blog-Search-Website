@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 
-export const loader: LoaderFunction = async () => {
+export const loader: LoaderFunction = async ({ request }) => {
   const supabase = getSupabase();
   const { data: recentBlogs, error } = await supabase
     .from("posts")
@@ -17,6 +17,21 @@ export const loader: LoaderFunction = async () => {
   if (error) {
     console.error("Error fetching recent blogs:", error.message);
     return json({ recentBlogs: [], searchResults: [] });
+  }
+
+  const searchQuery = new URLSearchParams(request.url.split("?")[1]).get("search");
+  if (searchQuery) {
+    const { data: searchResults, error } = await supabase
+      .from("posts")
+      .select("*")
+      .ilike("heading", `%${searchQuery}%`);
+
+    if (error) {
+      console.error("Error searching blogs:", error.message);
+      return json({ recentBlogs: [], searchResults: [] });
+    }
+
+    return json({ recentBlogs: [], searchResults });
   }
 
   return json({ recentBlogs, searchResults: [] });
@@ -50,7 +65,7 @@ export const action: ActionFunction = async ({ request }) => {
 
 export default function AfterLogin() {
   const actionData = useActionData();
-  const { recentBlogs } = useLoaderData();
+  const { recentBlogs, searchResults } = useLoaderData();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [displaySearch, setDisplaySearch] = useState(false);
@@ -101,6 +116,8 @@ export default function AfterLogin() {
   const toggleSearch = () => {
     setDisplaySearch((prevState) => !prevState);
   };
+
+  const displayBlogs = searchResults.length > 0 ? searchResults : blogs;
 
   return (
     <div className="relative w-full h-screen bg-gray-200 flex">
@@ -220,12 +237,21 @@ export default function AfterLogin() {
                   className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-gray-900 px-6 py-2 text-white hover:bg-gray-800 focus:outline-none"
                 >
                   Search
-                </Button>
+                  </Button>
               </div>
             </form>
           )}
+          <div className="mt-6">
+            {displayBlogs.map((blog: any) => (
+              <div key={blog.id} className="mb-6">
+                <h3 className="text-xl font-semibold">{blog.heading}</h3>
+                <p className="text-gray-600">{blog.content}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
   );
 }
+
