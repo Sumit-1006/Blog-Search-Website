@@ -224,14 +224,6 @@ export default function AfterLogin() {
               </div>
             </form>
           )}
-          <div className="mt-6">
-            {blogs.map((blog: any) => (
-              <div key={blog.id} className="mb-6">
-                <h3 className="text-xl font-semibold">{blog.heading}</h3>
-                <p className="text-gray-600">{blog.content}</p>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </div>
