@@ -249,71 +249,117 @@ export default function AfterLogin() {
             )}
             <br />
             <div>
-              <Form method="get" className="relative" onSubmit={handleSearch}>
-                <div className="relative flex items-center">
-                  <input
-                    name="query"
-                    type="search"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search..."
-                    className="w-full h-12 px-6 py-4 text-lg rounded-full bg-white/90 text-gray-900 focus:bg-white focus:outline-none"
-                  />
-                  {searchQuery && (
-                    <button
-                      type="button"
-                      className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-800 focus:outline-none"
-                      onClick={handleClearSearch}
-                    >
-                      &times;
-                    </button>
-                  )}
-                </div>
-                <button
-                  type="submit"
-                  className="absolute right-0 top-0 h-12 px-6 text-lg font-semibold text-white bg-blue-500 rounded-full hover:bg-blue-600 focus:outline-none"
-                >
-                  Search
-                </button>
-              </Form>
+            <Form method="get" className="relative">
+              <div className="relative flex items-center">
+                <Input
+                  name="query"
+                  type="search"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search..."
+                  className="w-full h-12 px-6 py-4 text-lg rounded-full bg-white/90 text-gray-900 focus:bg-white focus:outline-none"
+                />
+                {searchQuery && (
+                  <Button
+                    type="button"
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-800 focus:outline-none"
+                    onClick={handleClearSearch}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
+              <Button
+                type="submit"
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-gray-900 px-6 py-2 text-white hover:bg-gray-800 focus:outline-none"
+              >
+                Search
+              </Button>
+            </Form>
             </div>
             
           </div>
         </div>
-        {displaySearch && (
-          <div className="absolute inset-0 bg-black bg-opacity-50 flex justify-center items-center z-20">
-            <div className="bg-white w-full max-w-2xl p-8 rounded-lg shadow-lg">
-              <h2 className="text-2xl font-bold mb-6 text-center">
-                Search Results
-              </h2>
-              <div>
-                {supabaseData?.length > 0 ? (
-                  supabaseData.map((post) => (
-                    <div
-                      key={post.id}
-                      className="mb-4 p-4 border rounded-lg cursor-pointer"
-                      onClick={() => navigate(`/newdetail/${post.id}`)}
-                    >
-                      <h3 className="text-xl font-semibold mb-2">
-                        {post.heading}
-                      </h3>
-                      <p>{post.content}</p>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-center">No results found.</p>
-                )}
-              </div>
-              <button
-                type="button"
-                className="mt-4 px-6 py-3 text-lg bg-red-500 text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
-                onClick={toggleSearch}
+        
+      </div>
+      <div className="relative z-10 mt-8 px-4 md:px-6 lg:px-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {supabaseData.length > 0 ? (
+            supabaseData.map((post: any) => (
+              <div
+                key={post.id}
+                className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
               >
-                Close
-              </button>
-            </div>
-          </div>
-        )}
+                <div
+                  className="relative overflow-hidden rounded-t-lg cursor-pointer"
+                  onClick={() => togglePostExpansion(post.id)}
+                  onKeyPress={(e) => handleKeyPress(e, post.id)}
+                  tabIndex={0}
+                >
+                  <img
+                    src={post.image_url}
+                    alt={post.heading}
+                    className="w-full h-96 object-cover"
+                  />
+                  <div className="p-4 bg-gray-600 text-white">
+                    <h3 className="text-lg font-bold mb-2 text-center capitalize">
+                      {post.heading}
+                    </h3>
+                    {expandedPostId === post.id ? (
+                      <div dangerouslySetInnerHTML={{ __html: post.content }} />
+                    ) : (
+                      <div className="flex justify-center">
+                        <Button
+                          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md focus:outline-none"
+                          onClick={() => handleExploreSupabase(post.id)}
+                        >
+                          Explore
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-800"></p>
+          )}
+          {/* Display results from Unsplash API */}
+          {unsplashData.results && unsplashData.results.length > 0 ? (
+            unsplashData.results.map((photo: any) => (
+              <div
+                key={photo.id}
+                className="relative overflow-hidden rounded-lg shadow-md bg-gray-400 hover:scale-105 transition-transform duration-300"
+              >
+                <img
+                  src={photo.urls.small}
+                  alt={photo.alt_description}
+                  className="w-full h-96 object-cover rounded-t-lg cursor-pointer"
+                  onClick={() => navigate(`/detail/${photo.id}`)}
+                  onKeyPress={(e) => handleKeyPress(e, photo.id)}
+                  tabIndex={0}
+                />
+                <div className="p-4 bg-gray-600 text-white">
+                  <h3 className="text-lg font-bold mb-2 text-center capitalize">
+                    {photo.alt_description}
+                  </h3>
+                  <div className="flex justify-center">
+                    <Link
+                      to={`/detail/${photo.id}`}
+                      className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md focus:outline-none"
+                    >
+                      Explore
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-800"></p>
+          )}
+
+          {/* Display results from Supabase database */}
+        </div>
       </div>
     </div>
   );
