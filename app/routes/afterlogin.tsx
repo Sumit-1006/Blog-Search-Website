@@ -28,9 +28,8 @@ export const action: ActionFunction = async ({ request }) => {
   const heading = formData.get("heading") as string;
   const content = formData.get("content") as string;
 
-  // Check if any field is empty
   if (!imageUrl.trim() || !heading.trim() || !content.trim()) {
-    return json({ error: "Please fill the empty columns" }, { status: 400 });
+    return json({ error: "Please fill all fields" }, { status: 400 });
   }
 
   const supabase = getSupabase();
@@ -40,10 +39,10 @@ export const action: ActionFunction = async ({ request }) => {
 
   if (error) {
     console.error("Supabase Insert Error:", error.message);
-    return json({ error: error.message }, { status: 500 });
+    return json({ error: "Failed to add blog" }, { status: 500 });
   }
 
-  return json({ success: "New Blog Added" });
+  return json({ success: "New blog added" });
 };
 
 export default function AfterLogin() {
@@ -89,7 +88,7 @@ export default function AfterLogin() {
     if (error) {
       console.error("Error searching blogs:", error.message);
     } else {
-      setBlogs(searchResults);
+      setBlogs(searchResults || []);
     }
     setDisplaySearch(false);
   };
