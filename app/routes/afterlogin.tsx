@@ -106,7 +106,7 @@ export default function AfterLogin() {
     <div className="relative w-full h-screen bg-gray-200 flex">
       {/* Sidebar with Blog History */}
       <div className="bg-gray-900 text-white w-1/5 py-8 px-4 z-10">
-        <h2 className="text-2xl font-bold mb-4">Blog History</h2>
+        <h2 className="text-2xl font-bold mb-4">Recently Added</h2>
         <ul>
           {blogHistory.slice(0, 7).map((post: any) => (
             <li
@@ -224,6 +224,14 @@ export default function AfterLogin() {
               </div>
             </form>
           )}
+          <div className="mt-6">
+            {blogs.map((blog: any) => (
+              <div key={blog.id} className="mb-6">
+                <h3 className="text-xl font-semibold">{blog.heading}</h3>
+                <p className="text-gray-600">{blog.content}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
