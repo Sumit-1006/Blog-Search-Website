@@ -19,7 +19,7 @@ export const loader: LoaderFunction = async () => {
     return json({ recentBlogs: [], searchResults: [] });
   }
 
-  return json({ recentBlogs, searchResults: recentBlogs });
+  return json({ recentBlogs, searchResults: [] });
 };
 
 export const action: ActionFunction = async ({ request }) => {
@@ -28,8 +28,9 @@ export const action: ActionFunction = async ({ request }) => {
   const heading = formData.get("heading") as string;
   const content = formData.get("content") as string;
 
+  // Check if any field is empty
   if (!imageUrl.trim() || !heading.trim() || !content.trim()) {
-    return json({ error: "Please fill all fields" }, { status: 400 });
+    return json({ error: "Please fill the empty columns" }, { status: 400 });
   }
 
   const supabase = getSupabase();
@@ -39,26 +40,27 @@ export const action: ActionFunction = async ({ request }) => {
 
   if (error) {
     console.error("Supabase Insert Error:", error.message);
-    return json({ error: "Failed to add blog" }, { status: 500 });
+    return json({ error: error.message }, { status: 500 });
   }
 
-  return json({ success: "New blog added" });
+  return json({ success: "New Blog Added" });
 };
 
 export default function AfterLogin() {
   const actionData = useActionData();
-  const { searchResults } = useLoaderData();
+  const { recentBlogs } = useLoaderData();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [displaySearch, setDisplaySearch] = useState(false);
-  const [blogs, setBlogs] = useState<any[]>(searchResults || []);
+  const [blogs, setBlogs] = useState<any[]>([]);
   const [blogHistory, setBlogHistory] = useState<any[]>([]);
 
   useEffect(() => {
-    if (searchResults) {
-      setBlogs(searchResults);
+    if (recentBlogs) {
+      setBlogs(recentBlogs);
+      setBlogHistory(recentBlogs);
     }
-  }, [searchResults]);
+  }, [recentBlogs]);
 
   const handleSignOut = async () => {
     const supabase = getSupabase();
@@ -74,7 +76,7 @@ export default function AfterLogin() {
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchQuery.trim()) {
-      alert("Please fill the search query");
+      alert("Please fill the empty columns");
       return;
     }
 
