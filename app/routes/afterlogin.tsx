@@ -163,7 +163,7 @@ export default function AfterLogin() {
         className="absolute inset-0 w-full h-full object-cover filter blur-sm"
       />
       <div className="relative w-full h-screen flex">
-        <div className="bg-gray-900 text-white w-1/5 py-8 px-4 z-10">
+        <div className="bg-gray-900 text-white w-1/5 py-8 px-4 z-10 h-screen overflow-y-auto">
           <h2 className="text-2xl font-bold mb-4">Blog History</h2>
           <ul>
             {blogHistory.slice(0, 7).map((post: any) => (
