@@ -28,6 +28,11 @@ export const action: ActionFunction = async ({ request }) => {
   const heading = formData.get("heading") as string;
   const content = formData.get("content") as string;
 
+  // Check if any field is empty
+  if (!imageUrl.trim() || !heading.trim() || !content.trim()) {
+    return json({ error: "Please fill the empty columns" }, { status: 400 });
+  }
+
   const supabase = getSupabase();
   const { error } = await supabase.from("posts").insert([
     { image_url: imageUrl, heading, content, created_at: new Date() }
@@ -70,6 +75,12 @@ export default function AfterLogin() {
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Check if any field is empty
+    if (!searchQuery.trim()) {
+      alert("Please fill the empty columns");
+      return;
+    }
+
     const supabase = getSupabase();
     const { data: searchResults, error } = await supabase
       .from("posts")
@@ -88,22 +99,26 @@ export default function AfterLogin() {
   return (
     <div className="relative w-full h-screen bg-gray-200 flex">
       {/* Sidebar with Blog History */}
-      {/* Sidebar with Blog History */}
-<div className="bg-gray-900 text-white w-1/5 py-8 px-4">
-  <h2 className="text-2xl font-bold mb-4">Blog History</h2>
-  <ul>
-    {blogHistory.slice(0, 7).map((post: any) => (
-      <li
-        key={post.id}
-        className="mb-4 cursor-pointer hover:underline list-disc list-inside"
-        onClick={() => navigate(`/newdetail/${post.id}`)}
-      >
-        {post.heading}
-      </li>
-    ))}
-  </ul>
-</div>
+      <div className="bg-gray-900 text-white w-1/5 py-8 px-4 z-10">
+        <h2 className="text-2xl font-bold mb-4">Blog History</h2>
+        <ul>
+          {blogHistory.slice(0, 7).map((post: any) => (
+            <li
+              key={post.id}
+              className="mb-4 cursor-pointer hover:underline list-disc list-inside"
+              onClick={() => navigate(`/newdetail/${post.id}`)}
+            >
+              {post.heading}
+            </li>
+          ))}
+        </ul>
+      </div>
 
+      {/* Background Image with Blur Effect */}
+      <div
+        className="absolute inset-0 z-0 bg-cover bg-center"
+        style={{ backgroundImage: 'url("image (1).png")', filter: "blur(8px)" }}
+      ></div>
 
       {/* Main Content Area */}
       <div className="flex-1 relative z-10 px-4 md:px-6 lg:px-8 flex justify-center items-center">
