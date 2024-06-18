@@ -19,7 +19,7 @@ export const loader: LoaderFunction = async () => {
     return json({ recentBlogs: [], searchResults: [] });
   }
 
-  return json({ recentBlogs, searchResults: [] });
+  return json({ recentBlogs, searchResults: recentBlogs });
 };
 
 export const action: ActionFunction = async ({ request }) => {
@@ -47,19 +47,18 @@ export const action: ActionFunction = async ({ request }) => {
 
 export default function AfterLogin() {
   const actionData = useActionData();
-  const { recentBlogs } = useLoaderData();
+  const { searchResults } = useLoaderData();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [displaySearch, setDisplaySearch] = useState(false);
-  const [blogs, setBlogs] = useState<any[]>([]);
+  const [blogs, setBlogs] = useState<any[]>(searchResults || []);
   const [blogHistory, setBlogHistory] = useState<any[]>([]);
 
   useEffect(() => {
-    if (recentBlogs) {
-      setBlogs(recentBlogs);
-      setBlogHistory(recentBlogs);
+    if (searchResults) {
+      setBlogs(searchResults);
     }
-  }, [recentBlogs]);
+  }, [searchResults]);
 
   const handleSignOut = async () => {
     const supabase = getSupabase();
@@ -75,7 +74,7 @@ export default function AfterLogin() {
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchQuery.trim()) {
-      alert("Please fill the empty columns");
+      alert("Please fill the search query");
       return;
     }
 
@@ -88,7 +87,7 @@ export default function AfterLogin() {
     if (error) {
       console.error("Error searching blogs:", error.message);
     } else {
-      setBlogs(searchResults || []);
+      setBlogs(searchResults);
     }
     setDisplaySearch(false);
   };
