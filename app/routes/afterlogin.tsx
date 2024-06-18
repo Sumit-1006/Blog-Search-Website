@@ -277,50 +277,7 @@ export default function AfterLogin() {
                 </button>
               </Form>
             </div>
-            <div>
-              <h2 className="text-2xl font-bold my-6 text-center">Recent Blogs</h2>
-              <div>
-                {blogs.map((post) => (
-                  <div
-                    key={post.id}
-                    className={`mb-4 p-4 border rounded-lg ${
-                      expandedPostId === post.id ? "bg-gray-100" : ""
-                    }`}
-                  >
-                    <div
-                      className="cursor-pointer"
-                      onClick={() => togglePostExpansion(post.id)}
-                      onKeyDown={(event) =>
-                        handleKeyPress(event, post.id)
-                      }
-                      tabIndex={0}
-                      role="button"
-                    >
-                      <h3 className="text-xl font-semibold mb-2">
-                        {post.heading}
-                      </h3>
-                      {expandedPostId === post.id && (
-                        <div>
-                          <img
-                            src={post.image_url}
-                            alt={post.heading}
-                            className="w-full h-64 object-cover mb-4 rounded-lg"
-                          />
-                          <p>{post.content}</p>
-                        </div>
-                      )}
-                    </div>
-                    <button
-                      type="button"
-                      className="mt-2 text-blue-500 hover:underline"
-                      onClick={() => handleExploreSupabase(post.id)}
-                    >
-                      Read More
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
+            
           </div>
         </div>
         {displaySearch && (
