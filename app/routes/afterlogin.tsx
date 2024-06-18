@@ -34,9 +34,11 @@ export const action: ActionFunction = async ({ request }) => {
   }
 
   const supabase = getSupabase();
-  const { error } = await supabase.from("posts").insert([
-    { image_url: imageUrl, heading, content, created_at: new Date() }
-  ]);
+  const { error } = await supabase
+    .from("posts")
+    .insert([
+      { image_url: imageUrl, heading, content, created_at: new Date() },
+    ]);
 
   if (error) {
     console.error("Supabase Insert Error:", error.message);
@@ -96,6 +98,10 @@ export default function AfterLogin() {
     setDisplaySearch(false);
   };
 
+  const toggleSearch = () => {
+    setDisplaySearch((prevState) => !prevState);
+  };
+
   return (
     <div className="relative w-full h-screen bg-gray-200 flex">
       {/* Sidebar with Blog History */}
@@ -137,27 +143,67 @@ export default function AfterLogin() {
           </div>
         )}
         <div className="max-w-4xl w-full p-6 bg-white bg-opacity-70 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-bold mb-6 text-center">Enter the New Data</h2>
+          <h2 className="text-2xl font-bold mb-6 text-center">
+            Enter the New Data
+          </h2>
           <Form method="post">
             <div className="space-y-6">
               <div className="space-y-4">
-                <label htmlFor="image-url" className="text-lg">Image URL</label>
-                <input id="image-url" name="image-url" placeholder="Enter image URL" className="w-full px-4 py-2 text-lg bg-white bg-opacity-70 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <label htmlFor="image-url" className="text-lg">
+                  Image URL
+                </label>
+                <input
+                  id="image-url"
+                  name="image-url"
+                  placeholder="Enter image URL"
+                  className="w-full px-4 py-2 text-lg bg-white bg-opacity-70 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
               </div>
               <div className="space-y-4">
-                <label htmlFor="heading" className="text-lg">Heading</label>
-                <input id="heading" name="heading" placeholder="Enter heading" className="w-full px-4 py-2 text-lg bg-white bg-opacity-70 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <label htmlFor="heading" className="text-lg">
+                  Heading
+                </label>
+                <input
+                  id="heading"
+                  name="heading"
+                  placeholder="Enter heading"
+                  className="w-full px-4 py-2 text-lg bg-white bg-opacity-70 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
               </div>
               <div className="space-y-4">
-                <label htmlFor="content" className="text-lg">Content</label>
-                <textarea id="content" name="content" placeholder="Enter content" rows={5} className="w-full px-4 py-2 text-lg bg-white bg-opacity-70 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <label htmlFor="content" className="text-lg">
+                  Content
+                </label>
+                <textarea
+                  id="content"
+                  name="content"
+                  placeholder="Enter content"
+                  rows={5}
+                  className="w-full px-4 py-2 text-lg bg-white bg-opacity-70 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
               </div>
             </div>
             <div className="flex justify-center mt-6">
-              <button type="submit" className="px-6 py-3 text-lg bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">Add Data</button>
+              <button
+                type="submit"
+                className="px-6 py-3 text-lg bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                Add Data
+              </button>
             </div>
           </Form>
-          {actionData?.error && <p className="text-red-600 mt-4">{actionData.error}</p>}
+          {actionData?.error && (
+            <p className="text-red-600 mt-4">{actionData.error}</p>
+          )}
+          <div className="flex justify-center mt-6">
+            <button
+              type="button"
+              className="px-6 py-3 text-lg bg-gray-900 text-white hover:bg-gray-800 focus:outline-none"
+              onClick={toggleSearch}
+            >
+              Search Blog
+            </button>
+          </div>
           {displaySearch && (
             <form onSubmit={handleSearch} className="mt-6">
               <div className="relative flex items-center">
@@ -167,7 +213,7 @@ export default function AfterLogin() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search blogs..."
-                  className="w-full h-12 px-6 py-4 text-lg rounded-full bg-white/90 text-gray-900 focus:bg-white focus:outline-none"
+                  className="w-full h-12 px-6 py-4 text-lg rounded-full bg-white/90 text-gray-900 focus focus"
                 />
                 <Button
                   type="submit"
